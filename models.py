@@ -1,8 +1,8 @@
 from django.db import models
 
 class Question(models.Model):
-    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
-    question_text = models.CharField(max_length=200)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    question_text = models.TextField()
     grade = models.IntegerField(default=1)
 
     def is_get_score(self, selected_ids):
