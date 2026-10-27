@@ -1,48 +1,46 @@
 {% extends 'onlinecourse/base.html' %}
 
 {% block content %}
-<div class="container my-4">
+<div class="container-fluid">
     <h2>{{ course.name }}</h2>
     <p>{{ course.description }}</p>
 
-    <hr>
-
     <h3>Lessons</h3>
-    {% for lesson in course.lesson_set.all %}
-    <div class="card my-3">
-        <div class="card-header font-weight-bold">
-            Lesson {{ lesson.order }}: {{ lesson.title }}
-        </div>
-        <div class="card-body">
-            <p>{{ lesson.content }}</p>
-        </div>
-    </div>
-    {% endfor %}
-
-    {% if user.is_authenticated %}
-    <hr>
-    <h3>Course Exam</h3>
-    <form action="{% url 'onlinecourse:submit' course.id %}" method="post">
-        {% csrf_token %}
-        {% for question in course.question_set.all %}
-        <div class="card my-3">
-            <div class="card-header font-weight-bold">
-                {{ question.question_text }}
-            </div>
+    <div class="card-columns">
+        {% for lesson in course.lesson_set.all %}
+        <div class="card">
+            <div class="card-header font-weight-bold">Lesson {{ lesson.order }}: {{ lesson.title }}</div>
             <div class="card-body">
-                {% for choice in question.choice_set.all %}
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="choice_{{ choice.id }}" id="choice_{{ choice.id }}" value="{{ choice.id }}">
-                    <label class="form-check-label" for="choice_{{ choice.id }}">
-                        {{ choice.choice_text }}
-                    </label>
-                </div>
-                {% endfor %}
+                <p class="card-text">{{ lesson.content }}</p>
             </div>
         </div>
         {% endfor %}
-        <button type="submit" class="btn btn-primary my-2">Submit Exam</button>
-    </form>
+    </div>
+
+    {% if user.is_authenticated %}
+    <br>
+    <button class="btn btn-primary btn-block" data-toggle="collapse" data-target="#exam">Start Exam</button>
+    <div id="exam" class="collapse">
+        <form id="questionform" action="{% url 'onlinecourse:submit' course.id %}" method="post">
+            {% csrf_token %}
+            {% for question in course.question_set.all %}
+            <div class="card mt-1">
+                <div class="card-header"><h5>{{ question.question_text }}</h5></div>
+                <div class="card-body">
+                    {% for choice in question.choice_set.all %}
+                    <div class="form-check">
+                        <label class="form-check-label">
+                            <input type="checkbox" name="choice_{{ choice.id }}" class="form-check-input" value="{{ choice.id }}">
+                            {{ choice.choice_text }}
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+            <input class="btn btn-success btn-block mt-2" type="submit" value="Submit Exam">
+        </form>
+    </div>
     {% endif %}
 </div>
 {% endblock %}
