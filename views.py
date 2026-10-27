@@ -7,16 +7,13 @@ def submit(request, course_id):
     course = get_object_or_404(Course, pk=course_id)
     user = request.user
     
-    # Get enrollment record for the user and course
     enrollment = Enrollment.objects.get(user=user, course=course)
     
-    # Extract selected choice IDs from POST parameters
     selected_ids = []
     for key, value in request.POST.items():
         if key.startswith('choice_'):
             selected_ids.append(int(value))
             
-    # Create submission instance and associate choices
     submission = Submission.objects.create(enrollment=enrollment)
     submission.choices.set(selected_ids)
     submission.save()
@@ -30,13 +27,11 @@ def show_exam_result(request, course_id, submission_id):
     course = get_object_or_404(Course, pk=course_id)
     submission = get_object_or_404(Submission, pk=submission_id)
     
-    # Collect IDs of selected choices
     selected_ids = [choice.id for choice in submission.choices.all()]
     
     total_score = 0
     total_possible = 0
     
-    # Calculate score based on correct choice evaluation
     for question in course.question_set.all():
         total_possible += question.grade
         if question.is_get_score(selected_ids):
