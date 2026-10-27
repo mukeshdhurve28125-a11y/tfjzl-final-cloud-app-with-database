@@ -1,46 +1,27 @@
-{% extends 'onlinecourse/base.html' %}
-
+{% extends "onlinecourse/base_course.html" %}
 {% block content %}
 <div class="container-fluid">
     <h2>{{ course.name }}</h2>
     <p>{{ course.description }}</p>
 
     <h3>Lessons</h3>
-    <div class="card-columns">
+    <div class="accordion" id="accordionLesson">
         {% for lesson in course.lesson_set.all %}
-        <div class="card">
-            <div class="card-header font-weight-bold">Lesson {{ lesson.order }}: {{ lesson.title }}</div>
-            <div class="card-body">
-                <p class="card-text">{{ lesson.content }}</p>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-
-    {% if user.is_authenticated %}
-    <br>
-    <button class="btn btn-primary btn-block" data-toggle="collapse" data-target="#exam">Start Exam</button>
-    <div id="exam" class="collapse">
-        <form id="questionform" action="{% url 'onlinecourse:submit' course.id %}" method="post">
-            {% csrf_token %}
-            {% for question in course.question_set.all %}
-            <div class="card mt-1">
-                <div class="card-header"><h5>{{ question.question_text }}</h5></div>
-                <div class="card-body">
-                    {% for choice in question.choice_set.all %}
-                    <div class="form-check">
-                        <label class="form-check-label">
-                            <input type="checkbox" name="choice_{{ choice.id }}" class="form-check-input" value="{{ choice.id }}">
-                            {{ choice.choice_text }}
-                        </label>
+            <div class="card">
+                <div class="card-header" id="heading{{ lesson.id }}">
+                    <h5 class="mb-0">
+                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ lesson.id }}">
+                            {{ lesson.title }}
+                        </button>
+                    </h5>
+                </div>
+                <div id="collapse{{ lesson.id }}" class="collapse" data-parent="#accordionLesson">
+                    <div class="card-body">
+                        {{ lesson.content }}
                     </div>
-                    {% endfor %}
                 </div>
             </div>
-            {% endfor %}
-            <input class="btn btn-success btn-block mt-2" type="submit" value="Submit Exam">
-        </form>
+        {% endfor %}
     </div>
-    {% endif %}
 </div>
 {% endblock %}
